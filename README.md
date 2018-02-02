@@ -7,13 +7,23 @@ This repository has several components:
 * [helm charts](charts) used in the deployment of docker images for the publisher and consumer to Kubernetes
 * [Kubernetes YAML files](kafka) used to deploy Zookeeper and Kafka to Kubernetes
 
-## Install Zookeeper and Kafka
+## Useful links
+
+* [helm](https://github.com/kubernetes/helm) to create templates for k8s YAML files
+* [ark](https://github.com/heptio/ark/) for backup restore in kubernetes
+* [authenticator](https://github.com/heptio/authenticator) for setting up auth to AWS IAM users
+* [dex](https://github.com/coreos/dex) for auth to LDAP
+* [kops](https://github.com/kubernetes/kops) for provisioning k8s on AWS
+
+## Building and deploying components to k8s
+
+### Install Zookeeper and Kafka
 ```
 kubectl create -f kafka/zookeeper/*.yml
 kubectl create -f kafka/kafka.yml
 ```
 
-## Docker
+### Docker
 
 Build docker images
 ```
@@ -45,7 +55,7 @@ Access the shell of the Kafka consumer docker image
 make kafka-consumer_shell
 ```
 
-## Install Helm charts for the producer and the consumer
+### Install Helm charts for the producer and the consumer
 
 Install [helm](https://github.com/kubernetes/helm) on your local machine. Then install helm on your k8s cluster by running.
 
@@ -71,10 +81,3 @@ Tail the logs for the publisher deployment
 ```
 kubectl logs -f deployment/publisher-publisher
 ```
-
-## Useful links
-
-* [ark](https://github.com/heptio/ark/) for backup restore in kubernetes
-* [authenticator](https://github.com/heptio/authenticator) for setting up auth to AWS IAM users
-* [dex](https://github.com/coreos/dex) for auth to LDAP
-* [kops](https://github.com/kubernetes/kops) for provisioning k8s on AWS
