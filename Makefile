@@ -73,10 +73,6 @@ push:
 	$(info ${DOCKER_TAGS})
 	$(foreach tag, ${DOCKER_TAGS}, docker push ${tag}${\n})
 
-run: java_run
-
-shell: java_shell
-
 ci: build push
 
 .PHONY: all build push run ci
