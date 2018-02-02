@@ -1,0 +1,50 @@
+FROM debian:stretch-slim
+
+ENV \
+  TERM=xterm \
+  LC_ALL=C.UTF-8 \
+  DEBIAN_FRONTEND=noninteractive
+
+COPY requirements.txt /
+
+RUN \
+    set -ex \
+    echo 'LC_ALL=C.UTF-8' >> /etc/environment \
+    echo 'DEBIAN_FRONTEND=noninteractive' >> /etc/environment \
+    && apt-get update \
+    && apt-get -qq -y --force-yes install --no-install-recommends \
+        python-pip \
+        python-setuptools \
+        python-dev \
+        build-essential \
+        git \
+        python-tk \
+        librdkafka-dev \
+        localepurge \
+    && pip install --upgrade pip \
+    && pip install setuptools --upgrade \
+    && pip install -r /requirements.txt \
+    && apt-get -y purge build-essential python-dev python-pip python-setuptools git localepurge \
+    && apt-get -y autoremove \
+    && apt-get clean \
+    && rm -rf \
+        doc \
+        man \
+        info \
+        locale \
+        common-licenses \
+        ~/.bashrc \
+        /var/lib/apt/lists/* \
+        /var/log/**/* \
+        /var/cache/debconf/* \
+        /etc/systemd \
+        /lib/lsb \
+        /lib/udev \
+        /usr/share/doc/ \
+        /usr/share/doc-base/ \
+        /usr/share/man/ \
+        /tmp/*
+
+COPY publisher.py /
+
+CMD ["/usr/bin/python", "/publisher.py"]
