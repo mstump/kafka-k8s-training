@@ -1,0 +1,72 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kafka
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: broker
+  namespace: kafka
+  labels:
+    app: kafka
+spec:
+  ports:
+  - port: 9092
+  clusterIP: None
+  selector:
+    app: kafka
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+  namespace: kafka
+spec:
+  ports:
+  - port: 9092
+  selector:
+    app: kafka
+
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: kafka
+  namespace: kafka
+  labels:
+    app: kafka
+spec:
+  serviceName: "broker"
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: broker
+        image: solsson/kafka-persistent:0.10.1@sha256:0719b4688b666490abf4b32a3cc5c5da7bb2d6276b47377b35de5429f783e9c2
+        ports:
+        - containerPort: 9092
+        command:
+        - sh
+        - -c
+        - "./bin/kafka-server-start.sh config/server.properties --override auto.create.topics.enable=true --override broker.id=$(hostname | awk -F'-' '{print $2}')"
+        volumeMounts:
+        - name: "kafka-datadir"
+          mountPath: /opt/kafka/data
+  volumeClaimTemplates:
+  - metadata:
+      name: "kafka-datadir"
+      annotations:
+        volume.beta.kubernetes.io/storage-class: "default"
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: "200Gi"
